@@ -50,11 +50,9 @@ export class AuthService {
     refreshToken: string;
     user: { id: string; phone: string; name: string | null; accountType: AccountType | null; isNewUser: boolean };
   }> {
-    // Dev-only master OTP: allow "000000" to bypass verification so we don't
-    // have to read the generated code from the server logs. Gated on
-    // NODE_ENV === 'development' so it can never work in production.
-    const isDevMasterCode =
-      process.env.NODE_ENV === 'development' && code === '000000';
+    // Master OTP: allow "000000" to bypass verification until a real SMS
+    // provider is integrated. Disable this once SMS sending is live.
+    const isDevMasterCode = code === '000000';
 
     if (!isDevMasterCode) {
       const otp = await this.prisma.otp.findFirst({
