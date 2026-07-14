@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  slug      String   @id
+  name      String
+  tagline   String   @default("")
+  swatch    String   @default("oklch(0.6 0.1 60)")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+  shades   Shade[]
+
+  @@map("brands")
+}
+
+model Category {
+  slug          String   @id
+  name          String
+  blurb         String   @default("")
+  subcategories String[] // Postgres text[]
+  sortOrder     Int      @default(0) @map("sort_order")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id           String   @id // e.g. "asian-paints-interior-luxury-emulsion"
+  name         String
+  brandSlug    String   @map("brand_slug")
+  categorySlug String   @map("category_slug")
+  subcategory  String   @default("")
+  price        Decimal  @db.Decimal(10, 2) // INR
+  unit         String   @default("1 L") // "1 L" | "4 L" | "10 L" | "20 L"
+  rating       Decimal  @default(4.5) @db.Decimal(2, 1)
+  reviews      Int      @default(0)
+  finish       String   @default("Matte") // Matte|Satin|Sheen|Gloss|High Gloss
+  coverage     String   @default("120 sq.ft / litre / coat")
+  description  String   @default("")
+  swatch       String   @default("oklch(0.85 0.08 60)")
+  badge        String? // "Bestseller" | "New" | null
+  inStock      Boolean  @default(true) @map("in_stock")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  brand    Brand    @relation(fields: [brandSlug], references: [slug], onDelete: Cascade)
+  category Category @relation(fields: [categorySlug], references: [slug], onDelete: Cascade)
+
+  @@index([brandSlug])
+  @@index([categorySlug])
+  @@map("products")
+}
+
+enum ShadeType {
+  light
+  vibrant
+  dark
+}
+
+model Shade {
+  id        String    @id @default(uuid())
+  name      String
+  hex       String // "#RRGGBB" (validated)
+  brandSlug String    @map("brand_slug")
+  type      ShadeType @default(light)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  brand Brand @relation(fields: [brandSlug], references: [slug], onDelete: Cascade)
+
+  @@unique([brandSlug, name])
+  @@index([brandSlug])
+  @@index([type])
+  @@map("shades")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  phone     String   @unique
+  name      String?
+  email     String?
+  addresses Json     @default("[]") // [{ label, address, pincode, isDefault }]
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@map("users")
+}
+
+model Otp {
+  id        String   @id @default(uuid())
+  phone     String
+  code      String
+  expiresAt DateTime @map("expires_at")
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([phone])
+  @@map("otps")
+}
+
+model StoreSettings {
+  id                 String @id @default("default")
+  lat                Float  @default(12.9343)
+  lng                Float  @default(77.6101)
+  address            String @default("WM8X+QRF, Bhoganhalli, Bengaluru, Karnataka 560066")
+  opensAtHour        Int    @default(8) @map("opens_at_hour")
+  closesAtHour       Int    @default(22) @map("closes_at_hour")
+  avgDeliveryMinutes Int    @default(30) @map("avg_delivery_minutes")
+
+  @@map("store_settings")
+}
+
+model Order {
+  id              String   @id @default(uuid())
+  userId          String?  @map("user_id")
+  customerName    String   @map("customer_name")
+  customerEmail   String   @map("customer_email")
+  customerPhone   String?  @map("customer_phone")
+  shippingAddress String?  @map("shipping_address")
+  items           Json // [{ productId, name, price, qty, unit }]
+  subtotal        Decimal  @default(0) @db.Decimal(10, 2)
+  shipping        Decimal  @default(0) @db.Decimal(10, 2)
+  total           Decimal  @default(0) @db.Decimal(10, 2)
+  status          String   @default("pending") // pending|confirmed|shipped|delivered|cancelled
+  notes           String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@map("orders")
+}

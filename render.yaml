@@ -1,0 +1,38 @@
+services:
+  - type: web
+    name: pk-backend
+    env: node
+    region: oregon          # Free-tier region; change to singapore for paid plan (closer to India)
+    plan: free
+    buildCommand: pnpm install && pnpm build && npx prisma generate
+    startCommand: pnpm start:render
+    healthCheckPath: /healthz
+    autoDeploy: true
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+      # Linked automatically from the database below
+      - key: DATABASE_URL
+        fromDatabase:
+          name: paintkart-db
+          property: connectionString
+
+      # Generate a strong random secret on first deploy
+      - key: JWT_SECRET
+        generateValue: true
+
+      # Set manually in the Render dashboard after first deploy
+      - key: ADMIN_PASSCODE
+        sync: false
+
+      # Comma-separated list of allowed CORS origins, e.g. https://yourapp.com
+      - key: CORS_ORIGIN
+        sync: false
+
+databases:
+  - name: paintkart-db
+    databaseName: paintkart
+    plan: free
+    region: oregon
