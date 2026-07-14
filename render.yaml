@@ -4,7 +4,7 @@ services:
     env: node
     region: oregon          # Free-tier region; change to singapore for paid plan (closer to India)
     plan: free
-    buildCommand: pnpm install && pnpm build && npx prisma generate
+    buildCommand: pnpm install && pnpm build
     startCommand: pnpm start:render
     healthCheckPath: /healthz
     autoDeploy: true
