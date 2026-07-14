@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request, Optional } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -32,9 +33,11 @@ export class OrdersController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create order (public - guest checkout)' })
-  create(@Body() dto: CreateOrderDto) {
-    return this.ordersService.create(dto);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Create order (authenticated users)' })
+  create(@Body() dto: CreateOrderDto, @Request() req: any) {
+    return this.ordersService.create(dto, req.user?.userId);
   }
 
   @Patch(':id/status')

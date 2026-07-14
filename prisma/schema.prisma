@@ -85,14 +85,25 @@ model Shade {
   @@map("shades")
 }
 
+enum AccountType {
+  HOME_OWNER
+  ARCHITECT
+  CONTRACTOR
+  PAINTER
+  TRADER
+  OTHER
+  FLOORING
+}
+
 model User {
-  id        String   @id @default(uuid())
-  phone     String   @unique
-  name      String?
-  email     String?
-  addresses Json     @default("[]") // [{ label, address, pincode, isDefault }]
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id          String       @id @default(uuid())
+  phone       String       @unique
+  name        String?
+  email       String?
+  accountType AccountType? @map("account_type")
+  addresses   Json         @default("[]") // [{ label, address, pincode, isDefault }]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
 
   orders Order[]
 
@@ -133,6 +144,9 @@ model Order {
   items           Json // [{ productId, name, price, qty, unit }]
   subtotal        Decimal  @default(0) @db.Decimal(10, 2)
   shipping        Decimal  @default(0) @db.Decimal(10, 2)
+  couponCode      String?  @map("coupon_code")
+  couponDiscount  Decimal  @default(0) @db.Decimal(10, 2) @map("coupon_discount")
+  discount        Decimal  @default(0) @db.Decimal(10, 2) // auto rule-based discount
   total           Decimal  @default(0) @db.Decimal(10, 2)
   status          String   @default("pending") // pending|confirmed|shipped|delivered|cancelled
   notes           String?
@@ -143,4 +157,44 @@ model Order {
 
   @@index([userId])
   @@map("orders")
+}
+
+enum DiscountType {
+  PERCENTAGE
+  FIXED
+}
+
+model Discount {
+  id              String    @id @default(uuid())
+  name            String
+  description     String    @default("")
+  accountTypes    String[]  @map("account_types") // empty = all types
+  discountPercent Decimal   @db.Decimal(5, 2) @map("discount_percent")
+  minQty          Int       @default(1) @map("min_qty")
+  maxQty          Int?      @map("max_qty")
+  isActive        Boolean   @default(true) @map("is_active")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("discounts")
+}
+
+model Coupon {
+  id            String       @id @default(uuid())
+  code          String       @unique
+  description   String       @default("")
+  accountTypes  String[]     @map("account_types") // empty = all types
+  discountType  DiscountType @default(PERCENTAGE) @map("discount_type")
+  discountValue Decimal      @db.Decimal(10, 2) @map("discount_value")
+  minOrderValue Decimal      @default(0) @db.Decimal(10, 2) @map("min_order_value")
+  maxUses       Int?         @map("max_uses")
+  usedCount     Int          @default(0) @map("used_count")
+  validFrom     DateTime     @default(now()) @map("valid_from")
+  validUntil    DateTime?    @map("valid_until")
+  isActive      Boolean      @default(true) @map("is_active")
+  createdAt     DateTime     @default(now()) @map("created_at")
+  updatedAt     DateTime     @updatedAt @map("updated_at")
+
+  @@index([code])
+  @@map("coupons")
 }

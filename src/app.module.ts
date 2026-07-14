@@ -13,6 +13,8 @@ import { ShadesModule } from './shades/shades.module';
 import { OrdersModule } from './orders/orders.module';
 import { AdminModule } from './admin/admin.module';
 import { StoreModule } from './store/store.module';
+import { DiscountsModule } from './discounts/discounts.module';
+import { CouponsModule } from './coupons/coupons.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -30,6 +32,8 @@ import { AppService } from './app.service';
     OrdersModule,
     AdminModule,
     StoreModule,
+    DiscountsModule,
+    CouponsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -2,6 +2,7 @@ import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from '../prisma/prisma.service';
+import { AccountType } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -47,7 +48,7 @@ export class AuthService {
   async verifyOtp(phone: string, code: string): Promise<{
     accessToken: string;
     refreshToken: string;
-    user: { id: string; phone: string; name: string | null; isNewUser: boolean };
+    user: { id: string; phone: string; name: string | null; accountType: AccountType | null; isNewUser: boolean };
   }> {
     // Dev-only master OTP: allow "000000" to bypass verification so we don't
     // have to read the generated code from the server logs. Gated on
@@ -99,6 +100,7 @@ export class AuthService {
         id: user.id,
         phone: user.phone,
         name: user.name,
+        accountType: user.accountType,
         isNewUser,
       },
     };
@@ -112,6 +114,7 @@ export class AuthService {
         phone: true,
         name: true,
         email: true,
+        accountType: true,
         addresses: true,
         createdAt: true,
       },
@@ -124,7 +127,7 @@ export class AuthService {
     return user;
   }
 
-  async updateProfile(userId: string, data: { name?: string; email?: string }) {
+  async updateProfile(userId: string, data: { name?: string; email?: string; accountType?: AccountType }) {
     return this.prisma.user.update({
       where: { id: userId },
       data,
@@ -133,6 +136,7 @@ export class AuthService {
         phone: true,
         name: true,
         email: true,
+        accountType: true,
         addresses: true,
       },
     });
