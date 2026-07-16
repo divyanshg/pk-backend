@@ -4,6 +4,7 @@ import { UploadsController } from './uploads.controller';
 import { UploadsService } from './uploads.service';
 import { IMAGE_STORAGE_DRIVER } from './storage/image-storage.driver';
 import { LocalImageStorageDriver } from './storage/local-image-storage.driver';
+import { S3ImageStorageDriver } from './storage/s3-image-storage.driver';
 
 @Module({
   controllers: [UploadsController],
@@ -20,7 +21,7 @@ import { LocalImageStorageDriver } from './storage/local-image-storage.driver';
         }
 
         if (driver === 's3') {
-          throw new Error('STORAGE_DRIVER=s3 is not configured yet');
+          return new S3ImageStorageDriver(configService);
         }
 
         throw new Error(`Unsupported STORAGE_DRIVER: ${driver}`);

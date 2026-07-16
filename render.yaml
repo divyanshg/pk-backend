@@ -31,11 +31,33 @@ services:
       - key: CORS_ORIGIN
         sync: false
 
+      # Set to s3 after AWS env vars below are configured.
       - key: STORAGE_DRIVER
-        value: local
+        sync: false
 
+      # Used only by local storage. S3 uses AWS_S3_PUBLIC_BASE_URL or bucket URL.
       - key: PUBLIC_BASE_URL
         value: https://api.paintcart.in
+
+      - key: AWS_REGION
+        sync: false
+
+      - key: AWS_S3_BUCKET
+        sync: false
+
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+
+      # Optional: CloudFront/custom domain for returned S3 upload URLs.
+      - key: AWS_S3_PUBLIC_BASE_URL
+        sync: false
+
+      # Keep false unless the bucket allows legacy object ACLs.
+      - key: AWS_S3_PUBLIC_READ_ACL
+        value: false
 
 databases:
   - name: paintkart-db

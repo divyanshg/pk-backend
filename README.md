@@ -35,6 +35,55 @@ STORAGE_DRIVER="local"
 PUBLIC_BASE_URL="http://localhost:3000"
 ```
 
+### S3 Upload Storage
+
+Set these on Render to store uploads in S3:
+
+```env
+STORAGE_DRIVER="s3"
+AWS_REGION="ap-south-1"
+AWS_S3_BUCKET="your-upload-bucket"
+AWS_ACCESS_KEY_ID="..."
+AWS_SECRET_ACCESS_KEY="..."
+AWS_S3_PUBLIC_BASE_URL="https://your-cloudfront-or-bucket-domain"
+AWS_S3_PUBLIC_READ_ACL="false"
+```
+
+Objects are written under `uploads/<folder>/<filename>`. Prefer a bucket policy
+or CloudFront for public reads; leave `AWS_S3_PUBLIC_READ_ACL=false` unless your
+bucket explicitly supports object ACLs.
+
+Minimum IAM policy for the Render access key:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:DeleteObject"],
+      "Resource": "arn:aws:s3:::your-upload-bucket/uploads/*"
+    }
+  ]
+}
+```
+
+If serving directly from S3 instead of CloudFront, allow public reads for uploads:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::your-upload-bucket/uploads/*"
+    }
+  ]
+}
+```
+
 ## API Endpoints
 
 - **Swagger docs**: http://localhost:3000/docs

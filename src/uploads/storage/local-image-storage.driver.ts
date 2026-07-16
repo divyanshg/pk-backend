@@ -1,18 +1,10 @@
-import { randomBytes } from 'crypto';
 import { mkdir, unlink, writeFile } from 'fs/promises';
 import path from 'path';
 import { ConfigService } from '@nestjs/config';
 import type { UploadFolder } from '../upload.constants';
 import type { StoredUpload, UploadedImageFile } from '../upload.types';
 import type { ImageStorageDriver } from './image-storage.driver';
-
-const mimeExtensions: Record<string, { allowed: string[]; fallback: string }> =
-  {
-    'image/jpeg': { allowed: ['.jpg', '.jpeg'], fallback: '.jpg' },
-    'image/png': { allowed: ['.png'], fallback: '.png' },
-    'image/webp': { allowed: ['.webp'], fallback: '.webp' },
-    'image/avif': { allowed: ['.avif'], fallback: '.avif' },
-  };
+import { generateUploadFilename } from './upload-filename';
 
 export class LocalImageStorageDriver implements ImageStorageDriver {
   private readonly uploadsRoot = path.resolve(process.cwd(), 'uploads');
@@ -26,7 +18,7 @@ export class LocalImageStorageDriver implements ImageStorageDriver {
     const folderPath = path.join(this.uploadsRoot, folder);
     await mkdir(folderPath, { recursive: true });
 
-    const filename = this.generateFilename(file);
+    const filename = generateUploadFilename(file);
     await writeFile(path.join(folderPath, filename), file.buffer);
 
     return {
@@ -59,22 +51,6 @@ export class LocalImageStorageDriver implements ImageStorageDriver {
     } catch (error: any) {
       if (error?.code !== 'ENOENT') throw error;
     }
-  }
-
-  private generateFilename(file: UploadedImageFile) {
-    const ext = this.safeExtension(file);
-    return `${Date.now()}-${randomBytes(12).toString('hex')}${ext}`;
-  }
-
-  private safeExtension(file: UploadedImageFile) {
-    const clientExt = path.extname(file.originalname).toLowerCase();
-    const allowed = mimeExtensions[file.mimetype];
-
-    if (allowed?.allowed.includes(clientExt)) {
-      return clientExt;
-    }
-
-    return allowed?.fallback ?? '.img';
   }
 
   private get publicBaseUrl() {
