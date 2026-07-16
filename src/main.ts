@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import express from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
@@ -22,7 +23,8 @@ const allowedCorsOrigins = new Set([
 
 const isAllowedCorsOrigin = (origin?: string) => {
   if (!origin) return true;
-  if (allowedCorsOrigins.has('*') || allowedCorsOrigins.has(origin)) return true;
+  if (allowedCorsOrigins.has('*') || allowedCorsOrigins.has(origin))
+    return true;
 
   try {
     const { hostname, protocol } = new URL(origin);
@@ -44,6 +46,7 @@ async function bootstrap() {
     methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
+  app.use('/uploads', express.static('uploads'));
 
   // Swagger
   const config = new DocumentBuilder()

@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -60,6 +64,9 @@ export class CategoriesService {
             name: dto.name ?? existing.name,
             blurb: dto.blurb ?? existing.blurb,
             subcategories: dto.subcategories ?? existing.subcategories,
+            imageUrl: Object.prototype.hasOwnProperty.call(dto, 'imageUrl')
+              ? dto.imageUrl
+              : existing.imageUrl,
             sortOrder: dto.sortOrder ?? existing.sortOrder,
           },
         });

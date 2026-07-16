@@ -1,4 +1,14 @@
-import { IsString, IsNotEmpty, IsOptional, IsNumber, IsBoolean, Min, IsIn } from 'class-validator';
+import {
+  ArrayMaxSize,
+  IsArray,
+  IsBoolean,
+  IsIn,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -52,7 +62,10 @@ export class CreateProductDto {
   @IsOptional()
   reviews?: number;
 
-  @ApiPropertyOptional({ example: 'Matte', enum: ['Matte', 'Satin', 'Sheen', 'Gloss', 'High Gloss'] })
+  @ApiPropertyOptional({
+    example: 'Matte',
+    enum: ['Matte', 'Satin', 'Sheen', 'Gloss', 'High Gloss'],
+  })
   @IsString()
   @IsOptional()
   @IsIn(['Matte', 'Satin', 'Sheen', 'Gloss', 'High Gloss'])
@@ -78,6 +91,19 @@ export class CreateProductDto {
   @IsOptional()
   @IsIn(['Bestseller', 'New'])
   badge?: string;
+
+  @ApiPropertyOptional({
+    example: [
+      'https://api.paintcart.in/uploads/products/1737043200000-a1b2c3.jpg',
+      'https://api.paintcart.in/uploads/products/1737043200001-d4e5f6.webp',
+    ],
+    maxItems: 10,
+  })
+  @IsArray()
+  @ArrayMaxSize(10)
+  @IsString({ each: true })
+  @IsOptional()
+  images?: string[] | null;
 
   @ApiPropertyOptional({ example: true })
   @IsBoolean()

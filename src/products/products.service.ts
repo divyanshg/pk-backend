@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -10,7 +14,16 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async findAll(query: QueryProductsDto) {
-    const { brand, category, subcategory, search, badge, inStock, page = 1, pageSize = 20 } = query;
+    const {
+      brand,
+      category,
+      subcategory,
+      search,
+      badge,
+      inStock,
+      page = 1,
+      pageSize = 20,
+    } = query;
 
     const where: Prisma.ProductWhereInput = {};
 
@@ -94,7 +107,7 @@ export class ProductsService {
     }
 
     return this.prisma.product.create({
-      data: dto,
+      data: { ...dto, images: dto.images ?? [] },
       include: { brand: true, category: true },
     });
   }
@@ -104,7 +117,7 @@ export class ProductsService {
 
     return this.prisma.product.update({
       where: { id },
-      data: dto,
+      data: { ...dto, images: dto.images === null ? [] : dto.images },
       include: { brand: true, category: true },
     });
   }

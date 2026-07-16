@@ -31,6 +31,8 @@ JWT_SECRET="your-secret-here"
 ADMIN_PASSCODE="admin123"
 PORT=3000
 CORS_ORIGIN="http://localhost:8081"
+STORAGE_DRIVER="local"
+PUBLIC_BASE_URL="http://localhost:3000"
 ```
 
 ## API Endpoints
@@ -39,6 +41,7 @@ CORS_ORIGIN="http://localhost:8081"
 - **Health**: GET /healthz
 
 ### Public
+
 - GET /brands
 - GET /brands/:slug
 - GET /categories
@@ -51,8 +54,11 @@ CORS_ORIGIN="http://localhost:8081"
 - POST /orders (guest checkout)
 
 ### Admin (requires JWT)
+
 - POST /auth/admin/login `{"passcode": "..."}`
 - GET /admin/stats
+- POST /admin/uploads (multipart image upload)
+- DELETE /admin/uploads
 - POST/PUT/DELETE /brands, /categories, /products, /shades
 - POST /shades/import (CSV bulk import)
 - GET /orders

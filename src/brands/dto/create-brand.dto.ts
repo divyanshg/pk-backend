@@ -22,6 +22,14 @@ export class CreateBrandDto {
   @IsOptional()
   swatch?: string;
 
+  @ApiPropertyOptional({
+    example: 'https://api.paintcart.in/uploads/brands/1737043200000-a1b2c3.png',
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string | null;
+
   @ApiPropertyOptional({ example: 1 })
   @IsInt()
   @Min(0)

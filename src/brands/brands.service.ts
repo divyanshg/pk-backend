@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -65,6 +69,9 @@ export class BrandsService {
             name: dto.name ?? existing.name,
             tagline: dto.tagline ?? existing.tagline,
             swatch: dto.swatch ?? existing.swatch,
+            imageUrl: Object.prototype.hasOwnProperty.call(dto, 'imageUrl')
+              ? dto.imageUrl
+              : existing.imageUrl,
             sortOrder: dto.sortOrder ?? existing.sortOrder,
           },
         });

@@ -11,6 +11,7 @@ model Brand {
   name      String
   tagline   String   @default("")
   swatch    String   @default("oklch(0.6 0.1 60)")
+  imageUrl  String?  @map("image_url")
   sortOrder Int      @default(0) @map("sort_order")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -26,6 +27,7 @@ model Category {
   name          String
   blurb         String   @default("")
   subcategories String[] // Postgres text[]
+  imageUrl      String?  @map("image_url")
   sortOrder     Int      @default(0) @map("sort_order")
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")
@@ -50,6 +52,7 @@ model Product {
   description  String   @default("")
   swatch       String   @default("oklch(0.85 0.08 60)")
   badge        String? // "Bestseller" | "New" | null
+  images       String[] @default([])
   inStock      Boolean  @default(true) @map("in_stock")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")

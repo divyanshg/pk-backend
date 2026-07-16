@@ -15,6 +15,7 @@ import { AdminModule } from './admin/admin.module';
 import { StoreModule } from './store/store.module';
 import { DiscountsModule } from './discounts/discounts.module';
 import { CouponsModule } from './coupons/coupons.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -34,6 +35,7 @@ import { AppService } from './app.service';
     StoreModule,
     DiscountsModule,
     CouponsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -2,7 +2,7 @@ services:
   - type: web
     name: pk-backend
     env: node
-    region: oregon          # Free-tier region; change to singapore for paid plan (closer to India)
+    region: oregon # Free-tier region; change to singapore for paid plan (closer to India)
     plan: free
     buildCommand: pnpm install --prod=false && pnpm build
     startCommand: pnpm start:render
@@ -30,6 +30,12 @@ services:
       # Comma-separated list of allowed CORS origins, e.g. https://yourapp.com
       - key: CORS_ORIGIN
         sync: false
+
+      - key: STORAGE_DRIVER
+        value: local
+
+      - key: PUBLIC_BASE_URL
+        value: https://api.paintcart.in
 
 databases:
   - name: paintkart-db

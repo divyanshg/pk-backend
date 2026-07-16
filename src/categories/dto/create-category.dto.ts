@@ -1,4 +1,11 @@
-import { IsString, IsNotEmpty, IsOptional, IsArray, IsInt, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsArray,
+  IsInt,
+  Min,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateCategoryDto {
@@ -21,6 +28,15 @@ export class CreateCategoryDto {
   @IsArray()
   @IsString({ each: true })
   subcategories: string[];
+
+  @ApiPropertyOptional({
+    example:
+      'https://api.paintcart.in/uploads/categories/1737043200000-a1b2c3.png',
+    nullable: true,
+  })
+  @IsString()
+  @IsOptional()
+  imageUrl?: string | null;
 
   @ApiPropertyOptional({ example: 1 })
   @IsInt()
