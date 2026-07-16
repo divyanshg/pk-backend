@@ -3,14 +3,46 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 
+const defaultCorsOrigins = [
+  'https://paintcart.in',
+  'https://www.paintcart.in',
+  'http://localhost:8081',
+  'http://localhost:5173',
+];
+
+const configuredCorsOrigins =
+  process.env.CORS_ORIGIN?.split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean) ?? [];
+
+const allowedCorsOrigins = new Set([
+  ...defaultCorsOrigins,
+  ...configuredCorsOrigins,
+]);
+
+const isAllowedCorsOrigin = (origin?: string) => {
+  if (!origin) return true;
+  if (allowedCorsOrigins.has('*') || allowedCorsOrigins.has(origin)) return true;
+
+  try {
+    const { hostname, protocol } = new URL(origin);
+    return protocol === 'https:' && hostname.endsWith('.amplifyapp.com');
+  } catch {
+    return false;
+  }
+};
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Security
   app.use(helmet());
   app.enableCors({
-    origin: process.env.CORS_ORIGIN?.split(',') || '*',
-    credentials: true,
+    origin: (origin, callback) => {
+      callback(null, isAllowedCorsOrigin(origin));
+    },
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Swagger
