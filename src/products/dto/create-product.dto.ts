@@ -2,15 +2,30 @@ import {
   ArrayMaxSize,
   IsArray,
   IsBoolean,
+  IsEnum,
   IsIn,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   Min,
+  ValidateNested,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
+import { AccountType } from '@prisma/client';
+
+export class AccountTypePriceDto {
+  @ApiProperty({ enum: AccountType, example: AccountType.CONTRACTOR })
+  @IsEnum(AccountType)
+  accountType: AccountType;
+
+  @ApiProperty({ example: 1425 })
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  price: number;
+}
 
 export class CreateProductDto {
   @ApiProperty({ example: 'asian-paints-interior-luxury-emulsion' })
@@ -104,6 +119,16 @@ export class CreateProductDto {
   @IsString({ each: true })
   @IsOptional()
   images?: string[] | null;
+
+  @ApiPropertyOptional({
+    type: [AccountTypePriceDto],
+    example: [{ accountType: AccountType.CONTRACTOR, price: 1425 }],
+  })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => AccountTypePriceDto)
+  @IsOptional()
+  accountTypePricing?: AccountTypePriceDto[] | null;
 
   @ApiPropertyOptional({ example: true })
   @IsBoolean()

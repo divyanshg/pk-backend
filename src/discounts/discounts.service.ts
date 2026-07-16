@@ -25,6 +25,7 @@ export class DiscountsService {
         name: dto.name,
         description: dto.description ?? '',
         accountTypes: dto.accountTypes ?? [],
+        brandSlugs: dto.brandSlugs ?? [],
         discountPercent: dto.discountPercent,
         minQty: dto.minQty ?? 1,
         maxQty: dto.maxQty ?? null,

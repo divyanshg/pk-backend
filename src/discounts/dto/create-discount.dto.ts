@@ -1,4 +1,14 @@
-import { IsString, IsNotEmpty, IsOptional, IsArray, IsNumber, Min, Max, IsBoolean, IsInt } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsOptional,
+  IsArray,
+  IsNumber,
+  Min,
+  Max,
+  IsBoolean,
+  IsInt,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 
@@ -22,6 +32,15 @@ export class CreateDiscountDto {
   @IsOptional()
   accountTypes?: string[];
 
+  @ApiPropertyOptional({
+    example: ['asian-paints', 'berger'],
+    description: 'Empty array means discount applies to ALL brands',
+  })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  brandSlugs?: string[];
+
   @ApiProperty({ example: 10, description: 'Discount percentage (0–100)' })
   @IsNumber()
   @Min(0)
@@ -29,14 +48,20 @@ export class CreateDiscountDto {
   @Type(() => Number)
   discountPercent: number;
 
-  @ApiPropertyOptional({ example: 5, description: 'Minimum cart quantity to trigger this discount' })
+  @ApiPropertyOptional({
+    example: 5,
+    description: 'Minimum cart quantity to trigger this discount',
+  })
   @IsInt()
   @Min(1)
   @IsOptional()
   @Type(() => Number)
   minQty?: number;
 
-  @ApiPropertyOptional({ example: 19, description: 'Maximum cart quantity (null = no upper limit)' })
+  @ApiPropertyOptional({
+    example: 19,
+    description: 'Maximum cart quantity (null = no upper limit)',
+  })
   @IsInt()
   @Min(1)
   @IsOptional()

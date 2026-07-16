@@ -53,6 +53,7 @@ model Product {
   swatch       String   @default("oklch(0.85 0.08 60)")
   badge        String? // "Bestseller" | "New" | null
   images       String[] @default([])
+  accountTypePricing Json @default("[]") @map("account_type_pricing")
   inStock      Boolean  @default(true) @map("in_stock")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
@@ -172,6 +173,7 @@ model Discount {
   name            String
   description     String    @default("")
   accountTypes    String[]  @map("account_types") // empty = all types
+  brandSlugs      String[]  @default([]) @map("brand_slugs") // empty = all brands
   discountPercent Decimal   @db.Decimal(5, 2) @map("discount_percent")
   minQty          Int       @default(1) @map("min_qty")
   maxQty          Int?      @map("max_qty")

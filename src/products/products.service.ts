@@ -9,6 +9,10 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductsDto } from './dto/query-products.dto';
 import { Prisma } from '@prisma/client';
 
+const toAccountTypePricingJson = (
+  accountTypePricing?: CreateProductDto['accountTypePricing'] | null,
+) => (accountTypePricing ?? []) as unknown as Prisma.InputJsonValue;
+
 @Injectable()
 export class ProductsService {
   constructor(private prisma: PrismaService) {}
@@ -107,7 +111,11 @@ export class ProductsService {
     }
 
     return this.prisma.product.create({
-      data: { ...dto, images: dto.images ?? [] },
+      data: {
+        ...dto,
+        images: dto.images ?? [],
+        accountTypePricing: toAccountTypePricingJson(dto.accountTypePricing),
+      },
       include: { brand: true, category: true },
     });
   }
@@ -117,7 +125,14 @@ export class ProductsService {
 
     return this.prisma.product.update({
       where: { id },
-      data: { ...dto, images: dto.images === null ? [] : dto.images },
+      data: {
+        ...dto,
+        images: dto.images === null ? [] : dto.images,
+        accountTypePricing:
+          dto.accountTypePricing === undefined
+            ? undefined
+            : toAccountTypePricingJson(dto.accountTypePricing),
+      },
       include: { brand: true, category: true },
     });
   }
