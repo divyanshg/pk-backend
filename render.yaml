@@ -27,6 +27,13 @@ services:
       - key: ADMIN_PASSCODE
         sync: false
 
+      # Testing-only OTP bypass. Remove or set ALLOW_TEST_OTP=false before launch.
+      - key: ALLOW_TEST_OTP
+        value: "true"
+
+      - key: TEST_OTP_CODE
+        value: "000000"
+
       # Comma-separated list of allowed CORS origins, e.g. https://yourapp.com
       - key: CORS_ORIGIN
         sync: false

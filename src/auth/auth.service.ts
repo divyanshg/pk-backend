@@ -50,13 +50,16 @@ export class AuthService {
     refreshToken: string;
     user: { id: string; phone: string; name: string | null; accountType: AccountType | null; isNewUser: boolean };
   }> {
-    // Dev-only master OTP: allow "000000" to bypass verification so we don't
-    // have to read the generated code from the server logs. Gated on
-    // NODE_ENV === 'development' so it can never work in production.
-    const isDevMasterCode =
-      process.env.NODE_ENV === 'development' && code === '000000';
+    const testOtpCode =
+      this.configService.get<string>('TEST_OTP_CODE')?.trim() || '000000';
+    const allowTestOtp = ['1', 'true', 'yes', 'on'].includes(
+      (this.configService.get<string>('ALLOW_TEST_OTP') || '').toLowerCase(),
+    );
+    const isTestOtpCode =
+      (process.env.NODE_ENV === 'development' || allowTestOtp) &&
+      code === testOtpCode;
 
-    if (!isDevMasterCode) {
+    if (!isTestOtpCode) {
       const otp = await this.prisma.otp.findFirst({
         where: {
           phone,
