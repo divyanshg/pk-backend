@@ -59,10 +59,9 @@ export class CreateProductDto {
   @Min(0)
   price: number;
 
-  @ApiPropertyOptional({ example: '4 L', enum: ['1 L', '4 L', '10 L', '20 L'] })
+  @ApiPropertyOptional({ example: '4 L', description: 'e.g. 1 L, 4 L, 10 L, 1 kg, 5 kg, piece' })
   @IsString()
   @IsOptional()
-  @IsIn(['1 L', '4 L', '10 L', '20 L'])
   unit?: string;
 
   @ApiPropertyOptional({ example: 4.5 })
@@ -77,13 +76,9 @@ export class CreateProductDto {
   @IsOptional()
   reviews?: number;
 
-  @ApiPropertyOptional({
-    example: 'Matte',
-    enum: ['Matte', 'Satin', 'Sheen', 'Gloss', 'High Gloss'],
-  })
+  @ApiPropertyOptional({ example: 'Matte', description: 'Matte, Satin, Gloss, or leave empty for non-paint products' })
   @IsString()
   @IsOptional()
-  @IsIn(['Matte', 'Satin', 'Sheen', 'Gloss', 'High Gloss'])
   finish?: string;
 
   @ApiPropertyOptional({ example: '120 sq.ft / litre / coat' })
@@ -134,4 +129,12 @@ export class CreateProductDto {
   @IsBoolean()
   @IsOptional()
   inStock?: boolean;
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'If true, user must select a shade from the brand palette before checkout',
+  })
+  @IsBoolean()
+  @IsOptional()
+  requiresShade?: boolean;
 }

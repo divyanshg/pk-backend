@@ -53,6 +53,7 @@ model Product {
   swatch       String   @default("oklch(0.85 0.08 60)")
   badge        String? // "Bestseller" | "New" | null
   images       String[] @default([])
+  requiresShade Boolean  @default(false) @map("requires_shade")
   accountTypePricing Json @default("[]") @map("account_type_pricing")
   inStock      Boolean  @default(true) @map("in_stock")
   createdAt    DateTime @default(now()) @map("created_at")
@@ -127,13 +128,15 @@ model Otp {
 }
 
 model StoreSettings {
-  id                 String @id @default("default")
-  lat                Float  @default(12.9343)
-  lng                Float  @default(77.6101)
-  address            String @default("WM8X+QRF, Bhoganhalli, Bengaluru, Karnataka 560066")
-  opensAtHour        Int    @default(8) @map("opens_at_hour")
-  closesAtHour       Int    @default(22) @map("closes_at_hour")
-  avgDeliveryMinutes Int    @default(30) @map("avg_delivery_minutes")
+  id                 String   @id @default("default")
+  lat                Float    @default(12.9343)
+  lng                Float    @default(77.6101)
+  address            String   @default("WM8X+QRF, Bhoganhalli, Bengaluru, Karnataka 560066")
+  opensAtHour        Int      @default(8) @map("opens_at_hour")
+  closesAtHour       Int      @default(22) @map("closes_at_hour")
+  avgDeliveryMinutes Int      @default(30) @map("avg_delivery_minutes")
+  servingRadiusKm    Float    @default(50) @map("serving_radius_km")
+  featuredProductIds String[] @default([]) @map("featured_product_ids")
 
   @@map("store_settings")
 }
@@ -142,7 +145,7 @@ model Order {
   id              String   @id @default(uuid())
   userId          String?  @map("user_id")
   customerName    String   @map("customer_name")
-  customerEmail   String   @map("customer_email")
+  customerEmail   String?  @map("customer_email")
   customerPhone   String?  @map("customer_phone")
   shippingAddress String?  @map("shipping_address")
   items           Json // [{ productId, name, price, qty, unit }]

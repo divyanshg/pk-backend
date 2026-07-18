@@ -101,6 +101,28 @@ export class ProductsService {
     });
   }
 
+  async findFeatured() {
+    const settings = await this.prisma.storeSettings.findUnique({
+      where: { id: 'default' },
+      select: { featuredProductIds: true },
+    });
+
+    const ids = settings?.featuredProductIds ?? [];
+    if (ids.length === 0) return [];
+
+    const products = await this.prisma.product.findMany({
+      where: { id: { in: ids } },
+      include: {
+        brand: { select: { name: true, slug: true } },
+        category: { select: { name: true, slug: true } },
+      },
+    });
+
+    // Preserve the admin-defined order
+    const productMap = new Map(products.map((p) => [p.id, p]));
+    return ids.map((id) => productMap.get(id)).filter(Boolean);
+  }
+
   async create(dto: CreateProductDto) {
     const existing = await this.prisma.product.findUnique({
       where: { id: dto.id },

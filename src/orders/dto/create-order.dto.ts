@@ -27,6 +27,16 @@ export class OrderItemDto {
   @IsString()
   @IsNotEmpty()
   unit: string;
+
+  @ApiPropertyOptional({ example: '#F5C842', description: 'Hex code of the selected shade' })
+  @IsString()
+  @IsOptional()
+  shadeCode?: string;
+
+  @ApiPropertyOptional({ example: 'Sunshine Yellow', description: 'Name of the selected shade' })
+  @IsString()
+  @IsOptional()
+  shadeName?: string;
 }
 
 export class CreateOrderDto {
@@ -35,10 +45,10 @@ export class CreateOrderDto {
   @IsNotEmpty()
   customerName: string;
 
-  @ApiProperty({ example: 'john@example.com' })
+  @ApiPropertyOptional({ example: 'john@example.com' })
   @IsEmail()
-  @IsNotEmpty()
-  customerEmail: string;
+  @IsOptional()
+  customerEmail?: string;
 
   @ApiPropertyOptional({ example: '+91 98765 43210' })
   @IsString()

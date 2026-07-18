@@ -17,6 +17,12 @@ export class ProductsController {
     return this.productsService.findAll(query);
   }
 
+  @Get('featured')
+  @ApiOperation({ summary: 'Get admin-curated featured products' })
+  getFeatured() {
+    return this.productsService.findFeatured();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get product by ID' })
   findOne(@Param('id') id: string) {

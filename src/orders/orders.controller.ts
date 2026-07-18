@@ -24,6 +24,22 @@ export class OrdersController {
     );
   }
 
+  @Get('my')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get authenticated user's own orders" })
+  getMyOrders(@Request() req: any) {
+    return this.ordersService.findMyOrders(req.user.userId);
+  }
+
+  @Get('my/:id')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Get a specific order belonging to the authenticated user" })
+  getMyOrder(@Param('id') id: string, @Request() req: any) {
+    return this.ordersService.findMyOrder(id, req.user.userId);
+  }
+
   @Get(':id')
   @UseGuards(AdminGuard)
   @ApiBearerAuth()

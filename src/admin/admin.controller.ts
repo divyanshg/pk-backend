@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AdminService } from './admin.service';
 import { DiscountsService } from '../discounts/discounts.service';
 import { CouponsService } from '../coupons/coupons.service';
+import { StoreService, UpdateStoreDto } from '../store/store.service';
 import { CreateDiscountDto } from '../discounts/dto/create-discount.dto';
 import { CreateCouponDto } from '../coupons/dto/create-coupon.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -16,12 +17,27 @@ export class AdminController {
     private adminService: AdminService,
     private discountsService: DiscountsService,
     private couponsService: CouponsService,
+    private storeService: StoreService,
   ) {}
 
   @Get('stats')
   @ApiOperation({ summary: 'Get admin dashboard stats' })
   getStats() {
     return this.adminService.getStats();
+  }
+
+  // ── Store Settings ─────────────────────────────────────────────────────────
+
+  @Get('store')
+  @ApiOperation({ summary: 'Get store settings (admin)' })
+  getStore() {
+    return this.storeService.getInfo();
+  }
+
+  @Put('store')
+  @ApiOperation({ summary: 'Update store settings (admin)' })
+  updateStore(@Body() dto: UpdateStoreDto) {
+    return this.storeService.update(dto);
   }
 
   // ── Discounts ──────────────────────────────────────────────────────────────

@@ -47,6 +47,21 @@ export class OrdersService {
     return order;
   }
 
+  async findMyOrders(userId: string) {
+    return this.prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+    });
+  }
+
+  async findMyOrder(id: string, userId: string) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order || order.userId !== userId) {
+      throw new NotFoundException(`Order ${id} not found`);
+    }
+    return order;
+  }
+
   async create(dto: CreateOrderDto, userId?: string) {
     // Calculate subtotal from items
     const subtotal = dto.items.reduce((sum, item) => sum + item.price * item.qty, 0);
@@ -84,6 +99,8 @@ export class OrdersService {
       price: item.price,
       qty: item.qty,
       unit: item.unit,
+      ...(item.shadeCode && { shadeCode: item.shadeCode }),
+      ...(item.shadeName && { shadeName: item.shadeName }),
     })) as Prisma.InputJsonValue;
 
     return this.prisma.order.create({
