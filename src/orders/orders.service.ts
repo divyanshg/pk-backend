@@ -14,14 +14,42 @@ export class OrdersService {
     private couponsService: CouponsService,
   ) {}
 
-  async findAll(page = 1, pageSize = 20) {
+  async findAll(
+    page = 1,
+    pageSize = 20,
+    filters: { status?: string; search?: string; dateFrom?: string; dateTo?: string } = {},
+  ) {
+    const where: Prisma.OrderWhereInput = {};
+
+    if (filters.status) {
+      where.status = filters.status;
+    }
+    if (filters.search) {
+      where.OR = [
+        { customerName: { contains: filters.search, mode: 'insensitive' } },
+        { customerEmail: { contains: filters.search, mode: 'insensitive' } },
+        { customerPhone: { contains: filters.search } },
+      ];
+    }
+    if (filters.dateFrom || filters.dateTo) {
+      const createdAt: Prisma.DateTimeFilter<'Order'> = {};
+      if (filters.dateFrom) createdAt.gte = new Date(filters.dateFrom);
+      if (filters.dateTo) {
+        const to = new Date(filters.dateTo);
+        to.setHours(23, 59, 59, 999);
+        createdAt.lte = to;
+      }
+      where.createdAt = createdAt;
+    }
+
     const [items, total] = await Promise.all([
       this.prisma.order.findMany({
+        where,
         orderBy: { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
-      this.prisma.order.count(),
+      this.prisma.order.count({ where }),
     ]);
 
     return {

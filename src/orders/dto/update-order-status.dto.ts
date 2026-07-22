@@ -4,9 +4,9 @@ import { ApiProperty } from '@nestjs/swagger';
 export class UpdateOrderStatusDto {
   @ApiProperty({
     example: 'confirmed',
-    enum: ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'],
+    enum: ['pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled'],
   })
   @IsString()
-  @IsIn(['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'])
+  @IsIn(['pending', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled'])
   status: string;
 }

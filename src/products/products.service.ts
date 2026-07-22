@@ -1,12 +1,9 @@
-import {
-  Injectable,
-  NotFoundException,
-  ConflictException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductsDto } from './dto/query-products.dto';
+import { CreateVariantDto } from './dto/create-product.dto';
 import { Prisma } from '@prisma/client';
 
 const toAccountTypePricingJson = (
@@ -51,6 +48,7 @@ export class ProductsService {
         include: {
           brand: { select: { name: true, slug: true } },
           category: { select: { name: true, slug: true } },
+          variants: { orderBy: { sortOrder: 'asc' } },
         },
         orderBy: { name: 'asc' },
         skip: (page - 1) * pageSize,
@@ -76,6 +74,7 @@ export class ProductsService {
       include: {
         brand: true,
         category: true,
+        variants: { orderBy: { sortOrder: 'asc' } },
       },
     });
 
@@ -97,6 +96,7 @@ export class ProductsService {
       take: limit,
       include: {
         brand: { select: { name: true, slug: true } },
+        variants: { orderBy: { sortOrder: 'asc' } },
       },
     });
   }
@@ -115,6 +115,7 @@ export class ProductsService {
       include: {
         brand: { select: { name: true, slug: true } },
         category: { select: { name: true, slug: true } },
+        variants: { orderBy: { sortOrder: 'asc' } },
       },
     });
 
@@ -138,7 +139,7 @@ export class ProductsService {
         images: dto.images ?? [],
         accountTypePricing: toAccountTypePricingJson(dto.accountTypePricing),
       },
-      include: { brand: true, category: true },
+      include: { brand: true, category: true, variants: { orderBy: { sortOrder: 'asc' } } },
     });
   }
 
@@ -155,7 +156,33 @@ export class ProductsService {
             ? undefined
             : toAccountTypePricingJson(dto.accountTypePricing),
       },
-      include: { brand: true, category: true },
+      include: { brand: true, category: true, variants: { orderBy: { sortOrder: 'asc' } } },
+    });
+  }
+
+  async upsertVariants(productId: string, variants: CreateVariantDto[]) {
+    await this.findOne(productId);
+
+    await this.prisma.productVariant.deleteMany({ where: { productId } });
+
+    if (variants.length === 0) return [];
+
+    await this.prisma.productVariant.createMany({
+      data: variants.map((v, i) => ({
+        ...(v.id ? { id: v.id } : {}),
+        productId,
+        sku: v.sku ?? null,
+        unit: v.unit,
+        price: v.price,
+        mrp: v.mrp ?? null,
+        inStock: v.inStock ?? true,
+        sortOrder: v.sortOrder ?? i,
+      })),
+    });
+
+    return this.prisma.productVariant.findMany({
+      where: { productId },
+      orderBy: { sortOrder: 'asc' },
     });
   }
 

@@ -8,6 +8,7 @@ const defaultCorsOrigins = [
   'https://paintcart.in',
   'https://www.paintcart.in',
   'http://localhost:8081',
+  'http://localhost:8082',
   'http://localhost:5173',
 ];
 

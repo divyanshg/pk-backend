@@ -33,6 +33,11 @@ export class CreateProductDto {
   @IsNotEmpty()
   id: string;
 
+  @ApiPropertyOptional({ example: 'AP-INT-LUX-4L' })
+  @IsString()
+  @IsOptional()
+  sku?: string;
+
   @ApiProperty({ example: 'Asian Paints Luxury Emulsion' })
   @IsString()
   @IsNotEmpty()
@@ -137,4 +142,52 @@ export class CreateProductDto {
   @IsBoolean()
   @IsOptional()
   requiresShade?: boolean;
+}
+
+export class CreateVariantDto {
+  @ApiPropertyOptional({ example: 'clx1abc' })
+  @IsString()
+  @IsOptional()
+  id?: string;
+
+  @ApiPropertyOptional({ example: 'AP-INT-LUX-4L' })
+  @IsString()
+  @IsOptional()
+  sku?: string;
+
+  @ApiProperty({ example: '4 L' })
+  @IsString()
+  @IsNotEmpty()
+  unit: string;
+
+  @ApiProperty({ example: 1500 })
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  price: number;
+
+  @ApiPropertyOptional({ example: 1800 })
+  @IsNumber()
+  @Type(() => Number)
+  @Min(0)
+  @IsOptional()
+  mrp?: number;
+
+  @ApiPropertyOptional({ example: true })
+  @IsBoolean()
+  @IsOptional()
+  inStock?: boolean;
+
+  @ApiPropertyOptional({ example: 0 })
+  @IsNumber()
+  @Type(() => Number)
+  @IsOptional()
+  sortOrder?: number;
+}
+
+export class UpsertVariantsDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateVariantDto)
+  variants: CreateVariantDto[];
 }

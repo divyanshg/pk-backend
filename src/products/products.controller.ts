@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
-import { CreateProductDto } from './dto/create-product.dto';
+import { CreateProductDto, UpsertVariantsDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductsDto } from './dto/query-products.dto';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -57,5 +57,13 @@ export class ProductsController {
   @ApiOperation({ summary: 'Delete product (admin)' })
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
+  }
+
+  @Put(':id/variants')
+  @UseGuards(AdminGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Replace all variants for a product (admin)' })
+  upsertVariants(@Param('id') id: string, @Body() dto: UpsertVariantsDto) {
+    return this.productsService.upsertVariants(id, dto.variants);
   }
 }

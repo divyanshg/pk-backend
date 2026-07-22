@@ -39,6 +39,7 @@ model Category {
 
 model Product {
   id           String   @id // e.g. "asian-paints-interior-luxury-emulsion"
+  sku          String?  @map("sku")
   name         String
   brandSlug    String   @map("brand_slug")
   categorySlug String   @map("category_slug")
@@ -61,10 +62,29 @@ model Product {
 
   brand    Brand    @relation(fields: [brandSlug], references: [slug], onDelete: Cascade)
   category Category @relation(fields: [categorySlug], references: [slug], onDelete: Cascade)
+  variants ProductVariant[]
 
   @@index([brandSlug])
   @@index([categorySlug])
   @@map("products")
+}
+
+model ProductVariant {
+  id        String   @id @default(cuid())
+  productId String   @map("product_id")
+  sku       String?
+  unit      String
+  price     Decimal  @db.Decimal(10, 2)
+  mrp       Decimal? @db.Decimal(10, 2)
+  inStock   Boolean  @default(true) @map("in_stock")
+  sortOrder Int      @default(0) @map("sort_order")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_variants")
 }
 
 enum ShadeType {
